@@ -1,0 +1,2 @@
+Con la opción -a únicamente se realiza unicamente un backup de los datos y no así de la estructura de la base de datos
+Con la opción -v se puede ver detalladamente a través de comentarios todo el proceso de backup, así mismo los mensajes de progreso y errores ocurridos en el proceso.
