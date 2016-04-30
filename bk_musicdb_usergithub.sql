@@ -418,7 +418,7 @@ ALTER SEQUENCE "Track_TrackId_seq" OWNED BY "Track"."TrackId";
 
 
 --
--- Name: top20cancionxmedio; Type: TABLE; Schema: public; Owner: postgres
+-- Name: top20cancionxmedio; Type: TABLE; Schema: public; Owner: admin_user
 --
 
 CREATE TABLE top20cancionxmedio (
@@ -431,10 +431,10 @@ CREATE TABLE top20cancionxmedio (
 ALTER TABLE ONLY top20cancionxmedio REPLICA IDENTITY NOTHING;
 
 
-ALTER TABLE top20cancionxmedio OWNER TO postgres;
+ALTER TABLE top20cancionxmedio OWNER TO admin_user;
 
 --
--- Name: top3cliente; Type: TABLE; Schema: public; Owner: postgres
+-- Name: top3cliente; Type: TABLE; Schema: public; Owner: admin_user
 --
 
 CREATE TABLE top3cliente (
@@ -446,10 +446,10 @@ CREATE TABLE top3cliente (
 ALTER TABLE ONLY top3cliente REPLICA IDENTITY NOTHING;
 
 
-ALTER TABLE top3cliente OWNER TO postgres;
+ALTER TABLE top3cliente OWNER TO admin_user;
 
 --
--- Name: top5cancionxgenero; Type: TABLE; Schema: public; Owner: postgres
+-- Name: top5cancionxgenero; Type: TABLE; Schema: public; Owner: admin_user
 --
 
 CREATE TABLE top5cancionxgenero (
@@ -462,10 +462,10 @@ CREATE TABLE top5cancionxgenero (
 ALTER TABLE ONLY top5cancionxgenero REPLICA IDENTITY NOTHING;
 
 
-ALTER TABLE top5cancionxgenero OWNER TO postgres;
+ALTER TABLE top5cancionxgenero OWNER TO admin_user;
 
 --
--- Name: totalventamesxvendedor; Type: TABLE; Schema: public; Owner: postgres
+-- Name: totalventamesxvendedor; Type: TABLE; Schema: public; Owner: admin_user
 --
 
 CREATE TABLE totalventamesxvendedor (
@@ -477,7 +477,7 @@ CREATE TABLE totalventamesxvendedor (
 ALTER TABLE ONLY totalventamesxvendedor REPLICA IDENTITY NOTHING;
 
 
-ALTER TABLE totalventamesxvendedor OWNER TO postgres;
+ALTER TABLE totalventamesxvendedor OWNER TO admin_user;
 
 --
 -- Name: AlbumId; Type: DEFAULT; Schema: public; Owner: admin_user
@@ -11611,7 +11611,27 @@ ALTER TABLE ONLY "Track"
 
 
 --
--- Name: _RETURN; Type: RULE; Schema: public; Owner: postgres
+-- Name: _RETURN; Type: RULE; Schema: public; Owner: admin_user
+--
+
+CREATE RULE "_RETURN" AS
+    ON SELECT TO top20cancionxmedio DO INSTEAD  SELECT aux."TipoMedio",
+    aux.top,
+    aux."Cancion",
+    aux."Duracion"
+   FROM ( SELECT m."Name" AS "TipoMedio",
+            row_number() OVER (PARTITION BY m."MediaTypeId" ORDER BY t."Miliseconds" DESC, t."Name") AS top,
+            t."Name" AS "Cancion",
+            t."Miliseconds" AS "Duracion"
+           FROM ("Track" t
+             JOIN "MediaType" m ON ((m."MediaTypeId" = t."MediaTypeId")))
+          GROUP BY t."TrackId", m."MediaTypeId") aux
+  WHERE (aux.top <= 5)
+  ORDER BY aux."TipoMedio", aux.top;
+
+
+--
+-- Name: _RETURN; Type: RULE; Schema: public; Owner: admin_user
 --
 
 CREATE RULE "_RETURN" AS
@@ -11627,7 +11647,7 @@ CREATE RULE "_RETURN" AS
 
 
 --
--- Name: _RETURN; Type: RULE; Schema: public; Owner: postgres
+-- Name: _RETURN; Type: RULE; Schema: public; Owner: admin_user
 --
 
 CREATE RULE "_RETURN" AS
@@ -11648,27 +11668,7 @@ CREATE RULE "_RETURN" AS
 
 
 --
--- Name: _RETURN; Type: RULE; Schema: public; Owner: postgres
---
-
-CREATE RULE "_RETURN" AS
-    ON SELECT TO top20cancionxmedio DO INSTEAD  SELECT aux."TipoMedio",
-    aux.top,
-    aux."Cancion",
-    aux."Duracion"
-   FROM ( SELECT m."Name" AS "TipoMedio",
-            row_number() OVER (PARTITION BY m."MediaTypeId" ORDER BY t."Miliseconds" DESC, t."Name") AS top,
-            t."Name" AS "Cancion",
-            t."Miliseconds" AS "Duracion"
-           FROM ("Track" t
-             JOIN "MediaType" m ON ((m."MediaTypeId" = t."MediaTypeId")))
-          GROUP BY t."TrackId", m."MediaTypeId") aux
-  WHERE (aux.top <= 5)
-  ORDER BY aux."TipoMedio", aux.top;
-
-
---
--- Name: _RETURN; Type: RULE; Schema: public; Owner: postgres
+-- Name: _RETURN; Type: RULE; Schema: public; Owner: admin_user
 --
 
 CREATE RULE "_RETURN" AS
@@ -11788,7 +11788,7 @@ REVOKE ALL ON TABLE "Album" FROM PUBLIC;
 REVOKE ALL ON TABLE "Album" FROM admin_user;
 GRANT ALL ON TABLE "Album" TO admin_user;
 GRANT SELECT ON TABLE "Album" TO uasb_user;
-GRANT ALL ON TABLE "Album" TO operator_user;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "Album" TO operator_user;
 
 
 --
@@ -11799,7 +11799,7 @@ REVOKE ALL ON TABLE "Artist" FROM PUBLIC;
 REVOKE ALL ON TABLE "Artist" FROM admin_user;
 GRANT ALL ON TABLE "Artist" TO admin_user;
 GRANT SELECT ON TABLE "Artist" TO uasb_user;
-GRANT ALL ON TABLE "Artist" TO operator_user;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "Artist" TO operator_user;
 
 
 --
@@ -11810,7 +11810,7 @@ REVOKE ALL ON TABLE "Customer" FROM PUBLIC;
 REVOKE ALL ON TABLE "Customer" FROM admin_user;
 GRANT ALL ON TABLE "Customer" TO admin_user;
 GRANT SELECT ON TABLE "Customer" TO uasb_user;
-GRANT ALL ON TABLE "Customer" TO operator_user;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "Customer" TO operator_user;
 
 
 --
@@ -11821,7 +11821,7 @@ REVOKE ALL ON TABLE "Employee" FROM PUBLIC;
 REVOKE ALL ON TABLE "Employee" FROM admin_user;
 GRANT ALL ON TABLE "Employee" TO admin_user;
 GRANT SELECT ON TABLE "Employee" TO uasb_user;
-GRANT ALL ON TABLE "Employee" TO operator_user;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "Employee" TO operator_user;
 
 
 --
@@ -11832,7 +11832,7 @@ REVOKE ALL ON TABLE "Genre" FROM PUBLIC;
 REVOKE ALL ON TABLE "Genre" FROM admin_user;
 GRANT ALL ON TABLE "Genre" TO admin_user;
 GRANT SELECT ON TABLE "Genre" TO uasb_user;
-GRANT ALL ON TABLE "Genre" TO operator_user;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "Genre" TO operator_user;
 
 
 --
@@ -11843,7 +11843,7 @@ REVOKE ALL ON TABLE "Invoice" FROM PUBLIC;
 REVOKE ALL ON TABLE "Invoice" FROM admin_user;
 GRANT ALL ON TABLE "Invoice" TO admin_user;
 GRANT SELECT ON TABLE "Invoice" TO uasb_user;
-GRANT ALL ON TABLE "Invoice" TO operator_user;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "Invoice" TO operator_user;
 
 
 --
@@ -11854,7 +11854,7 @@ REVOKE ALL ON TABLE "InvoiceLine" FROM PUBLIC;
 REVOKE ALL ON TABLE "InvoiceLine" FROM admin_user;
 GRANT ALL ON TABLE "InvoiceLine" TO admin_user;
 GRANT SELECT ON TABLE "InvoiceLine" TO uasb_user;
-GRANT ALL ON TABLE "InvoiceLine" TO operator_user;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "InvoiceLine" TO operator_user;
 
 
 --
@@ -11865,7 +11865,7 @@ REVOKE ALL ON TABLE "MediaType" FROM PUBLIC;
 REVOKE ALL ON TABLE "MediaType" FROM admin_user;
 GRANT ALL ON TABLE "MediaType" TO admin_user;
 GRANT SELECT ON TABLE "MediaType" TO uasb_user;
-GRANT ALL ON TABLE "MediaType" TO operator_user;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "MediaType" TO operator_user;
 
 
 --
@@ -11876,7 +11876,7 @@ REVOKE ALL ON TABLE "Playlist" FROM PUBLIC;
 REVOKE ALL ON TABLE "Playlist" FROM admin_user;
 GRANT ALL ON TABLE "Playlist" TO admin_user;
 GRANT SELECT ON TABLE "Playlist" TO uasb_user;
-GRANT ALL ON TABLE "Playlist" TO operator_user;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "Playlist" TO operator_user;
 
 
 --
@@ -11887,7 +11887,7 @@ REVOKE ALL ON TABLE "PlaylistTrack" FROM PUBLIC;
 REVOKE ALL ON TABLE "PlaylistTrack" FROM admin_user;
 GRANT ALL ON TABLE "PlaylistTrack" TO admin_user;
 GRANT SELECT ON TABLE "PlaylistTrack" TO uasb_user;
-GRANT ALL ON TABLE "PlaylistTrack" TO operator_user;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "PlaylistTrack" TO operator_user;
 
 
 --
@@ -11898,54 +11898,50 @@ REVOKE ALL ON TABLE "Track" FROM PUBLIC;
 REVOKE ALL ON TABLE "Track" FROM admin_user;
 GRANT ALL ON TABLE "Track" TO admin_user;
 GRANT SELECT ON TABLE "Track" TO uasb_user;
-GRANT ALL ON TABLE "Track" TO operator_user;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "Track" TO operator_user;
 
 
 --
--- Name: top20cancionxmedio; Type: ACL; Schema: public; Owner: postgres
+-- Name: top20cancionxmedio; Type: ACL; Schema: public; Owner: admin_user
 --
 
 REVOKE ALL ON TABLE top20cancionxmedio FROM PUBLIC;
-REVOKE ALL ON TABLE top20cancionxmedio FROM postgres;
-GRANT ALL ON TABLE top20cancionxmedio TO postgres;
+REVOKE ALL ON TABLE top20cancionxmedio FROM admin_user;
+GRANT ALL ON TABLE top20cancionxmedio TO admin_user;
 GRANT SELECT ON TABLE top20cancionxmedio TO uasb_user;
-GRANT ALL ON TABLE top20cancionxmedio TO operator_user;
 GRANT SELECT ON TABLE top20cancionxmedio TO test_user;
 
 
 --
--- Name: top3cliente; Type: ACL; Schema: public; Owner: postgres
+-- Name: top3cliente; Type: ACL; Schema: public; Owner: admin_user
 --
 
 REVOKE ALL ON TABLE top3cliente FROM PUBLIC;
-REVOKE ALL ON TABLE top3cliente FROM postgres;
-GRANT ALL ON TABLE top3cliente TO postgres;
+REVOKE ALL ON TABLE top3cliente FROM admin_user;
+GRANT ALL ON TABLE top3cliente TO admin_user;
 GRANT SELECT ON TABLE top3cliente TO uasb_user;
-GRANT ALL ON TABLE top3cliente TO operator_user;
 GRANT SELECT ON TABLE top3cliente TO test_user;
 
 
 --
--- Name: top5cancionxgenero; Type: ACL; Schema: public; Owner: postgres
+-- Name: top5cancionxgenero; Type: ACL; Schema: public; Owner: admin_user
 --
 
 REVOKE ALL ON TABLE top5cancionxgenero FROM PUBLIC;
-REVOKE ALL ON TABLE top5cancionxgenero FROM postgres;
-GRANT ALL ON TABLE top5cancionxgenero TO postgres;
+REVOKE ALL ON TABLE top5cancionxgenero FROM admin_user;
+GRANT ALL ON TABLE top5cancionxgenero TO admin_user;
 GRANT SELECT ON TABLE top5cancionxgenero TO uasb_user;
-GRANT ALL ON TABLE top5cancionxgenero TO operator_user;
 GRANT SELECT ON TABLE top5cancionxgenero TO test_user;
 
 
 --
--- Name: totalventamesxvendedor; Type: ACL; Schema: public; Owner: postgres
+-- Name: totalventamesxvendedor; Type: ACL; Schema: public; Owner: admin_user
 --
 
 REVOKE ALL ON TABLE totalventamesxvendedor FROM PUBLIC;
-REVOKE ALL ON TABLE totalventamesxvendedor FROM postgres;
-GRANT ALL ON TABLE totalventamesxvendedor TO postgres;
+REVOKE ALL ON TABLE totalventamesxvendedor FROM admin_user;
+GRANT ALL ON TABLE totalventamesxvendedor TO admin_user;
 GRANT SELECT ON TABLE totalventamesxvendedor TO uasb_user;
-GRANT ALL ON TABLE totalventamesxvendedor TO operator_user;
 GRANT SELECT ON TABLE totalventamesxvendedor TO test_user;
 
 
